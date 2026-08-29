@@ -6,13 +6,17 @@ resource "kubernetes_config_map" "task_manager_config" {
   }
 
   data = {
-    NODE_ENV = "production"
-    APP_NAME = "Task Manager"
+    NODE_ENV      = "production"
+    APP_NAME      = "Task Manager"
+    DATABASE_HOST = kubernetes_service.postgres.metadata[0].name
+    DATABASE_PORT = "5432"
+    DATABASE_NAME = var.postgres_db
+    DATABASE_USER = var.postgres_user
   }
 }
 
 resource "kubernetes_deployment" "task_manager" {
-  depends_on = [null_resource.task_manager_image]
+  depends_on = [null_resource.task_manager_image, kubernetes_deployment.postgres]
 
   metadata {
     name = "task-manager"
@@ -50,6 +54,16 @@ resource "kubernetes_deployment" "task_manager" {
           env_from {
             config_map_ref {
               name = kubernetes_config_map.task_manager_config.metadata[0].name
+            }
+          }
+
+          env {
+            name = "DATABASE_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.postgres.metadata[0].name
+                key  = "POSTGRES_PASSWORD"
+              }
             }
           }
 
