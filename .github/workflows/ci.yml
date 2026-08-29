@@ -48,7 +48,7 @@ jobs:
           node-version: "20"
 
       - name: Instalar dependências
-        run: npm install
+        run: npm install --include=dev
 
       - name: Lint
         run: npm run lint --if-present
