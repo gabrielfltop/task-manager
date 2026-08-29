@@ -1,0 +1,17 @@
+# Loki + Promtail apenas. Grafana e Prometheus já vêm do
+# kube-prometheus-stack (ver observability.tf), então ficam desligados
+# aqui para não duplicar.
+
+loki:
+  enabled: true
+  persistence:
+    enabled: false
+
+promtail:
+  enabled: true
+
+grafana:
+  enabled: false
+
+prometheus:
+  enabled: false

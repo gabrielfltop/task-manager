@@ -1,0 +1,45 @@
+# Valores enxutos para rodar a stack em um cluster k3d local (poucos
+# recursos), mantendo os dashboards e datasources padrão do Kubernetes.
+
+grafana:
+  # Mantém o usuário/senha padrão do chart (admin / prom-operator), como
+  # indicado no material da atividade.
+  defaultDashboardsEnabled: true
+
+  # Sidecar que observa ConfigMaps com o label grafana_dashboard: "1" em
+  # qualquer namespace e os carrega automaticamente no Grafana. É assim
+  # que o dashboard customizado em dashboard.tf / dashboards/ aparece.
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+
+  # Datasource do Loki, pré-configurado (URL do Service criado pelo
+  # loki-stack — ver values/loki-stack-values.yaml e observability.tf).
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      access: proxy
+      url: http://loki:3100
+      isDefault: false
+
+  service:
+    type: ClusterIP
+
+prometheus:
+  prometheusSpec:
+    retention: 6h
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+
+# Desligado para economizar recursos em um cluster local de estudo; não é
+# necessário para os dashboards do Kubernetes.
+alertmanager:
+  enabled: false

@@ -1,0 +1,7 @@
+# Copie para terraform.tfvars e ajuste se quiser mudar os padrões.
+# terraform.tfvars NÃO deve ser commitado se contiver segredos reais.
+
+# cluster_name       = "task-manager-cluster"
+# k3d_agents         = 1
+# app_replicas       = 2
+# postgres_password  = "admin"

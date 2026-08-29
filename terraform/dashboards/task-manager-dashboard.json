@@ -1,0 +1,140 @@
+{
+  "id": null,
+  "uid": "task-manager-overview",
+  "title": "Task Manager - Visão Geral",
+  "description": "Métricas de pods e logs do namespace task-manager (Prometheus + Loki).",
+  "tags": ["task-manager", "kubernetes"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Pods em execução",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(kube_pod_status_phase{namespace=\"task-manager\", phase=\"Running\"})"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Reinicializações de containers",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(kube_pod_container_status_restarts_total{namespace=\"task-manager\"})"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Réplicas desejadas vs disponíveis (Deployment)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "legendFormat": "Desejadas",
+          "expr": "kube_deployment_spec_replicas{namespace=\"task-manager\", deployment=\"task-manager\"}"
+        },
+        {
+          "refId": "B",
+          "legendFormat": "Disponíveis",
+          "expr": "kube_deployment_status_replicas_available{namespace=\"task-manager\", deployment=\"task-manager\"}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Uso de CPU por pod",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "legendFormat": "{{pod}}",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"task-manager\", container!=\"\"}[5m])) by (pod)"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Uso de memória por pod",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "legendFormat": "{{pod}}",
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"task-manager\", container!=\"\"}) by (pod)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Tráfego de rede recebido",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "$datasource" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "fieldConfig": {
+        "defaults": { "unit": "Bps" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "legendFormat": "{{pod}}",
+          "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"task-manager\"}[5m])) by (pod)"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Logs recentes (Loki)",
+      "type": "logs",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{namespace=\"task-manager\"}"
+        }
+      ]
+    }
+  ]
+}

@@ -2,8 +2,10 @@
 
 Gerenciador de Tarefas (Task Manager) com Next.js 14 e PostgreSQL.
 
-> Esta branch (`main`) contém só a aplicação. Kubernetes, Terraform, CI/CD e
-> observabilidade ficam na branch `dev_aula`, usada na aula.
+> Esta cópia do repositório já inclui `terraform/` (k3d + Helm +
+> observabilidade) e `.github/workflows/ci.yml` (CI/CD). Veja
+> [`terraform/README.md`](./terraform/README.md) para o passo a passo
+> completo da atividade avaliativa.
 
 ## Demonstração
 
@@ -136,14 +138,14 @@ docker run -p 3000:3000 task-manager
 
 ## Kubernetes, Terraform, CI/CD e Observabilidade
 
-Não fazem parte desta branch. Veja a branch `dev_aula` deste repositório para
-os manifests Kubernetes, o Terraform (k3d + Helm) e o workflow de CI/CD.
-
-## Branches
-
-- **main**: só a aplicação (Next.js + API + Docker).
-- **dev_aula**: aplicação + Kubernetes + Terraform + CI/CD + observabilidade
-  (usada na aula).
+- **`k8s/`**: manifests brutos de referência (ConfigMap, Deployment,
+  Service) para `kubectl apply -f k8s/`.
+- **`terraform/`**: provisiona um cluster k3d local, sobe a aplicação
+  (+ Postgres) e instala Prometheus, Grafana, Loki e Promtail via Helm,
+  com um dashboard do Grafana já publicado. Passo a passo completo em
+  [`terraform/README.md`](./terraform/README.md).
+- **`.github/workflows/ci.yml`**: testa a aplicação contra um Postgres
+  de serviço e builda (e opcionalmente publica) a imagem Docker.
 
 ## Licença
 
